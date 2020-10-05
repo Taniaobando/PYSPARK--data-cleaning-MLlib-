@@ -13,7 +13,7 @@ from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, Row
 from pyspark.sql import SparkSession, DataFrameStatFunctions, DataFrameNaFunctions
 from pyspark.sql.functions import *
-#import seaborn as sns
+import seaborn as sns
 import matplotlib.pyplot as plt
 from pyspark.ml.classification import LogisticRegression, RandomForestClassifier
 from pyspark.ml.classification import LinearSVC
