@@ -13,7 +13,7 @@ from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, Row
 from pyspark.sql import SparkSession, DataFrameStatFunctions, DataFrameNaFunctions
 from pyspark.sql.functions import *
-import seaborn as sns
+#import seaborn as sns
 import matplotlib.pyplot as plt
 from pyspark.ml.classification import LogisticRegression, RandomForestClassifier
 from pyspark.ml.classification import LinearSVC
@@ -421,9 +421,6 @@ def svm(df,trainingData,testData,maxIterValue,regParamValue,depth,thresholdValue
 
     predictions = model.transform(testData)
 
-    # look at the result
-    predictions.select("prediction", "G3").show(5)
-
     # estimate the accuracy of the prediction
     #Métricas de evaluación
     multi_evaluator = MulticlassClassificationEvaluator(labelCol="G3", predictionCol="prediction", metricName="accuracy")
@@ -525,38 +522,41 @@ def main():
 
     print("Sin G1 y G2")
 
-    #rl1_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=50,thresholdValue=0.5,familyValue='binomial')
+    #Modelo regresión logistica-dataset1 con el mejor desempeño
     rl1_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=50,thresholdValue=0.55,familyValue='binomial')
-    rl2_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue=0.5,familyValue='binomial')
-    rl3_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue=0.55,familyValue='binomial')
-    rl4_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=150,thresholdValue=0.55,familyValue='binomial')
-    #rl3_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=50,thresholdValue=0.4,familyValue='binomial')
+
+    #Otros modelos de regresión logística evaluados para el dataset1
+    #rl2_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue=0.5,familyValue='binomial')
+    #rl3_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue=0.55,familyValue='binomial')
+    #rl4_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=150,thresholdValue=0.55,familyValue='binomial')
+    #rl5_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=50,thresholdValue=0.4,familyValue='binomial')
+    #rl6_model1=logistic_Regression(df1,trainingData_1,testData_1,maxIterValue=50,thresholdValue=0.5,familyValue='binomial')
 
     print("\n")
 
     print("Sin G1 y G2")
+    #Random forest dataset1 con mejor desempeño
+    rf1_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='onethird')
 
-    rf1_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,
-                                            featureSubsetStrategyValue='sqrt')
-    rf2_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,
-                                            featureSubsetStrategyValue='onethird')
-    rf3_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,
-                                            featureSubsetStrategyValue='log2')
-    rf4_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=3,
-                                            featureSubsetStrategyValue='sqrt')
-    rf4_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=8,
-                                            featureSubsetStrategyValue='sqrt')
+    #Otros modelos
+    #rf2_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='sqrt')
+    #rf3_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='log2')
+    #rf4_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=3,featureSubsetStrategyValue='sqrt')
+    #rf5_model1=random_Forest(df1,trainingData_1,testData_1, numTreesValue=10,maxDepthValue=8,featureSubsetStrategyValue='sqrt')
 
     print("Sin G1 y G2")
-    mvs1_model1=svm(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue = 0.0, depth = 2, regParamValue=0)
-    mvs2_model1=svm(df1,trainingData_1,testData_1,maxIterValue=10,thresholdValue = 0.0, depth = 2, regParamValue=0)
-    mvs3_model1=svm(df1,trainingData_1,testData_1,maxIterValue  = 100, thresholdValue = 0.0, depth = 2, regParamValue=0.1)
-    mvs4_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue = 0.0, depth = 2,  regParamValue=0.1)
-    mvs5_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
-    mvs6_model1=svm(df1,trainingData_1,testData_1, maxIterValue =150, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
-    mvs7_model1=svm(df1,trainingData_1,testData_1, maxIterValue  = 100, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
-    mvs8_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
-    mvs9_model1=svm(df1,trainingData_1,testData_1, maxIterValue  = 100, thresholdValue = 0.0, depth=3, regParamValue = 0.0)
+    #Vector de maquinas de soporte con mejor desempeño para dataset1
+    mvs1_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+
+    #Otros modelos
+    #mvs2_model1=svm(df1,trainingData_1,testData_1,maxIterValue=100,thresholdValue = 0.0, depth = 2, regParamValue=0)
+    #mvs3_model1=svm(df1,trainingData_1,testData_1,maxIterValue=10,thresholdValue = 0.0, depth = 2, regParamValue=0)
+    #mvs4_model1=svm(df1,trainingData_1,testData_1,maxIterValue  = 100, thresholdValue = 0.0, depth = 2, regParamValue=0.1)
+    #mvs5_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue = 0.0, depth = 2,  regParamValue=0.1)
+    #mvs6_model1=svm(df1,trainingData_1,testData_1, maxIterValue =10, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    #mvs7_model1=svm(df1,trainingData_1,testData_1, maxIterValue =150, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    #mvs8_model1=svm(df1,trainingData_1,testData_1, maxIterValue  = 100, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+    #mvs9_model1=svm(df1,trainingData_1,testData_1, maxIterValue  = 100, thresholdValue = 0.0, depth=3, regParamValue = 0.0)
   
 
     print("\n")
@@ -583,20 +583,44 @@ def main():
         'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2')
 
     #Partición de los dataframes
-    trainingData_2, testData_2= df2.randomSplit([0.7,0.3],seed=2102020)
+
+    trainingData_2, testData_2= df2.randomSplit([0.7,0.3],seed=3102020)
 
     print("Sin G2")
-    rl_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=50,thresholdValue=0.5,familyValue='binomial')
+    #Modelo regresión logistica-dataset1 con el mejor desempeño
+    rl1_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=100,thresholdValue=0.55,familyValue='binomial') 
+
+    #Otros modelos de regresión logística evaluados para el dataset1
+    #rl2_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=50,thresholdValue=0.55,familyValue='binomial')
+    #rl3_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=100,thresholdValue=0.5,familyValue='binomial')
+    #rl4_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=150,thresholdValue=0.55,familyValue='binomial')
+    #rl5_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=50,thresholdValue=0.4,familyValue='binomial')
+    #rl6_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=50,thresholdValue=0.5,familyValue='binomial')
+
     print("\n")
 
     print("Sin G2")
-    rf_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=8,
-                                         featureSubsetStrategyValue='log2')
-    print("\n")
+
+    #Mejor modelo de random forest para el dataset 2
+    rf1_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='onethird')
+
+    #Otros modelos
+    #rf2_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='sqrt')
+    #rf3_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=5,featureSubsetStrategyValue='log2')
+    #rf4_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=3,featureSubsetStrategyValue='sqrt')
+    #rf5_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=8,featureSubsetStrategyValue='sqrt')
 
     print("Sin G2")
-    mvs_model2=svm(df2,trainingData_2,testData_2,maxIterValue=50,regParamValue=0.1)
-    print("\n")
+
+    mvs1_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+    mvs2_model2=svm(df2,trainingData_2,testData_2,maxIterValue=100,thresholdValue = 0.0, depth = 2, regParamValue=0)
+    mvs3_model2=svm(df2,trainingData_2,testData_2,maxIterValue=10,thresholdValue = 0.0, depth = 2, regParamValue=0)
+    mvs4_model2=svm(df2,trainingData_2,testData_2,maxIterValue = 100, thresholdValue = 0.0, depth = 2, regParamValue=0.1)
+    mvs5_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2,  regParamValue=0.1)
+    mvs6_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    mvs7_model2=svm(df2,trainingData_2,testData_2, maxIterValue =150, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    mvs8_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+    mvs9_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue = 0.0, depth=3, regParamValue = 0.0)
 
     #Finaliza la sesión de spark
     spark.stop()
