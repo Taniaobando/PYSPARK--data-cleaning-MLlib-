@@ -583,7 +583,7 @@ def main():
         'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2')
 
     #Partición de los dataframes
-    trainingData_2, testData_2= df1.randomSplit([0.7,0.3],seed=2102020)
+    trainingData_2, testData_2= df2.randomSplit([0.7,0.3],seed=2102020)
 
     print("Sin G2")
     rl_model2=logistic_Regression(df2,trainingData_2,testData_2,maxIterValue=50,thresholdValue=0.5,familyValue='binomial')
