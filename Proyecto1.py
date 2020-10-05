@@ -611,16 +611,16 @@ def main():
     #rf5_model2=random_Forest(df2,trainingData_2,testData_2, numTreesValue=10,maxDepthValue=8,featureSubsetStrategyValue='sqrt')
 
     print("Sin G2")
+    mvs1_model2=svm(df2,trainingData_2,testData_2,maxIterValue=100,thresholdValue = 0.0, depth = 2, regParamValue=0)
 
-    mvs1_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
-    mvs2_model2=svm(df2,trainingData_2,testData_2,maxIterValue=100,thresholdValue = 0.0, depth = 2, regParamValue=0)
-    mvs3_model2=svm(df2,trainingData_2,testData_2,maxIterValue=10,thresholdValue = 0.0, depth = 2, regParamValue=0)
-    mvs4_model2=svm(df2,trainingData_2,testData_2,maxIterValue = 100, thresholdValue = 0.0, depth = 2, regParamValue=0.1)
-    mvs5_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2,  regParamValue=0.1)
-    mvs6_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
-    mvs7_model2=svm(df2,trainingData_2,testData_2, maxIterValue =150, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
-    mvs8_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
-    mvs9_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue = 0.0, depth=3, regParamValue = 0.0)
+    #mvs2_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+    #mvs3_model2=svm(df2,trainingData_2,testData_2,maxIterValue=10,thresholdValue = 0.0, depth = 2, regParamValue=0)
+    #mvs4_model2=svm(df2,trainingData_2,testData_2,maxIterValue = 100, thresholdValue = 0.0, depth = 2, regParamValue=0.1)
+    #mvs5_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2,  regParamValue=0.1)
+    #mvs6_model2=svm(df2,trainingData_2,testData_2, maxIterValue =10, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    #mvs7_model2=svm(df2,trainingData_2,testData_2, maxIterValue =150, thresholdValue = 0.0, depth = 2, regParamValue = 0.0)
+    #mvs8_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
+    #mvs9_model2=svm(df2,trainingData_2,testData_2, maxIterValue = 100, thresholdValue = 0.0, depth=3, regParamValue = 0.0)
 
     #Finaliza la sesión de spark
     spark.stop()
