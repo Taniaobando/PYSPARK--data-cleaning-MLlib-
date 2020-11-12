@@ -45,6 +45,26 @@ def showData(spark,dataframe,features):
     dataframe = spark.sql("SELECT {} from table1".format(fields))
     return dataframe
 
+def predict(row):
+    svm = LinearSVC.load("Modelo1")
+    predictions = svm.transform(row)
+
+    multi_evaluator = MulticlassClassificationEvaluator(labelCol="G3", predictionCol="prediction", metricName="accuracy")
+    accuracy = multi_evaluator.evaluate(predictions)
+
+    multi_evaluator = multi_evaluator.setMetricName('precisionByLabel')
+    precision = multi_evaluator.evaluate(predictions)
+
+    multi_evaluator = multi_evaluator.setMetricName('f1')
+    f1_score = multi_evaluator.evaluate(predictions)
+    
+    multi_evaluator = multi_evaluator.setMetricName('recallByLabel')
+    recall = multi_evaluator.evaluate(predictions)
+
+    bin_evaluator = BinaryClassificationEvaluator(labelCol="G3", rawPredictionCol="prediction", metricName="areaUnderROC")
+    area = bin_evaluator.evaluate(predictions)
+    return (accuracy,precision,f1_score,recall,area)
+
 #----------------------------PREPROCESAMIENTO-----------------------------------#
 def categoricalToNumerical(df):
     #Reemplazar valores categoricos a númericos
@@ -273,9 +293,43 @@ def main():
     #Crear Spark Session
     spark = SparkSession.builder.appName("Student").getOrCreate()
     
-    #Replicar esquema previamente usado
-    esquema=spark.read.csv('Datos streaming/feed/student-por1.csv',sep=';',header=True).schema
+    #--------------------------PREPROCESAMIENTO Y ENTREAMIENTO DEL MODELO--------------#
+
+    #Crear dataframe previamente usado
+    df=spark.read.csv('Datos streaming/feed/student-por1.csv',sep=';',header=True)
+    esquema = df.schema
+
+    #Reemplazar valores categoricos a numericos
+    df=categoricalToNumerical(df)
+
+    #Convertir los datos de string a int
+    df=stringToInt(df)
+
+    #Convertir variables categorica a numericas
+    df=approvedOrReproved(df)
     
+    #Eliminar datos atípicos
+    df=dropAtypicValues(df)
+    
+    vector = VectorAssembler(inputCols=['school','sex','age','address','famsize','Pstatus','Medu','Fedu','Mjob',
+        'Fjob','reason','guardian','traveltime','studytime','failures','schoolsup',
+        'famsup','paid','activities','nursery','higher','internet','romantic',
+        'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2'], outputCol="features")
+
+    #Adaptar los vectores al conjunto de datos
+    df_temp = vector.transform(df)
+
+    df = df_temp.drop('school','sex','age','address','famsize','Pstatus','Medu','Fedu','Mjob',
+        'Fjob','reason','guardian','traveltime','studytime','failures','schoolsup',
+        'famsup','paid','activities','nursery','higher','internet','romantic',
+        'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2')
+
+    svm = LinearSVC(labelCol="G3", featuresCol="features", maxIter =10, threshold=0.5, aggregationDepth = 2, regParam = 0.0)
+    model = svm.fit(df)
+    model.write().overwrite().save("Modelo1")
+
+    #---------------------------------STREAMING--------------------------------#
+
     #Crear dataframe para el streaming
     df=spark.readStream.csv('Datos streaming/read',sep=';',header=True,schema=esquema)
 
@@ -291,36 +345,35 @@ def main():
     #Eliminar datos atípicos
     df=dropAtypicValues(df)
     
-    #Balancear dataframe
-    #df=dataBalancing(df)
-
-    #------------------------CREACIÓN DE LOS DATASETS FINALES---------------------#
-    #Crear vectores assembler
-
     vector = VectorAssembler(inputCols=['school','sex','age','address','famsize','Pstatus','Medu','Fedu','Mjob',
         'Fjob','reason','guardian','traveltime','studytime','failures','schoolsup',
         'famsup','paid','activities','nursery','higher','internet','romantic',
-        'famrel','freetime','goout','Dalc','Walc','health','absences','G1'], outputCol="features")
+        'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2'], outputCol="features")
 
     #Adaptar los vectores al conjunto de datos
     df_temp = vector.transform(df)
 
-    #df_temp.show(5)
-    # get dataframe with all necedf_tempssary data in the appropriate form
-
-    final_df = df_temp.drop('school','sex','age','address','famsize','Pstatus','Medu','Fedu','Mjob',
+    df = df_temp.drop('school','sex','age','address','famsize','Pstatus','Medu','Fedu','Mjob',
         'Fjob','reason','guardian','traveltime','studytime','failures','schoolsup',
         'famsup','paid','activities','nursery','higher','internet','romantic',
         'famrel','freetime','goout','Dalc','Walc','health','absences','G1','G2')
 
-    #Partición de los dataframes
-    trainingData, testData= final_df.randomSplit([0.7,0.3],seed=3102020)
-    mvs1_model1=svm(final_df,trainingData,testData, maxIterValue =10, thresholdValue=0.5, depth = 2, regParamValue = 0.0)
     
     #Visualiación de los datos para propositos de depuración
-    show = showData(spark,df,["school","sex"])
-    show = show.writeStream.format("console").outputMode("update").trigger(processingTime='65 seconds').start()
-    show.awaitTermination()
+    test = df.writeStream.format("console").outputMode("update").foreach(predict).trigger(processingTime='65 seconds').start()
+    test.awaitTermination()
+
+
+
+
+
+
+
+
+    #Visualiación de los datos para propositos de depuración
+    #show = showData(spark,df,["G3"])
+    #show = show.writeStream.format("console").outputMode("update").trigger(processingTime='65 seconds').start()
+    #show.awaitTermination()
     #Finaliza la sesión de spark
     #spark.stop()
 
